@@ -100,16 +100,32 @@
             </div>
             <h5 class="card-title mt-3 mb-5 fw-bold text-center">Employee Data Master</h5>
             <hr>
-            <form>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
+
                 <div class="mb-3">
-                    <input type="email" class="form-control" name="" placeholder="Enter Your Email">
+                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Enter Your Email" value="{{ old('email') }}">
+
+                    @error('email')
+                        <div class="alert alert-danger" role="alert">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" name="" placeholder="Enter Your Password">
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" placeholder="Enter Your Password" value="{{ old('password') }}">
+
+                    @error('password')
+                        <div class="alert alert-danger" role="alert">
+                            {{ $message }}
+                        </div>
+                    @enderror
+
                 </div>
                 <hr>
                 <div class="d-grid gap-2 mt-4">
-                    <button class="btn btn-primary" type="button"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
+                    <button class="btn btn-primary" type="submit"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
                 </div>
             </form>
         </div>

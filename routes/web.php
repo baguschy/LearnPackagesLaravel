@@ -16,10 +16,10 @@ use App\Http\Controllers\EmployeeController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+Route::redirect('/', '/login');
 
 
 Auth::routes();
@@ -30,4 +30,3 @@ Route::get('profile', ProfileController::class)->name('profile');
 
 Route::resource('employees', EmployeeController::class);
 
-// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

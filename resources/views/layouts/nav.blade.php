@@ -27,7 +27,13 @@
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person-fill"></i> My Profile</a></li>
                     <hr class="mt-1">
-                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-lock-fill"></i> Log Out</a></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="bi bi-lock-fill"></i> Log Out</a>
+
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
