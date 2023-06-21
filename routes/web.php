@@ -16,9 +16,6 @@ use App\Http\Controllers\EmployeeController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
 Route::redirect('/', '/login');
 
 

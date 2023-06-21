@@ -22,7 +22,7 @@
 
             <div class="dropdown my-2 ms-md-auto">
                 <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle"></i> Administrator
+                    <i class="bi bi-person-circle"></i> {{ Auth::user()->name }}
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person-fill"></i> My Profile</a></li>
