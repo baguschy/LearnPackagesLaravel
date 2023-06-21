@@ -20,7 +20,16 @@
 
             <hr class="d-md-none text-white-50">
 
-            <a href="{{ route('profile') }}" class="btn btn-outline-light my-2 ms-md-auto"><i class="bi-person-circle me-1"></i> My Profile</a>
+            <div class="dropdown my-2 ms-md-auto">
+                <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i> Administrator
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person-fill"></i> My Profile</a></li>
+                    <hr class="mt-1">
+                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-lock-fill"></i> Log Out</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </nav>
