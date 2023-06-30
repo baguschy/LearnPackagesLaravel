@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Employee;
 use App\Models\Position;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 use Validator;
 
 class EmployeeController extends Controller
@@ -74,12 +76,30 @@ class EmployeeController extends Controller
         //     'position_id' => $request->position,
         // ]);
 
+        // Get File
+        $file = $request->file('cv');
+
+        if ($file != null) {
+            $originalFilename = $file->getClientOriginalName();
+            $encryptedFilename = $file->hashName();
+
+            // Store File
+            $file->store('public/files');
+        }
+
+
         $employee = New Employee;
         $employee->firstname = $request->firstName;
         $employee->lastname = $request->lastName;
         $employee->email = $request->email;
         $employee->age = $request->age;
         $employee->position_id = $request->position;
+
+        if ($file != null) {
+            $employee->original_filename = $originalFilename;
+            $employee->encrypted_filename = $encryptedFilename;
+        }
+
         $employee->save();
 
         // return $request->all();
@@ -153,11 +173,31 @@ class EmployeeController extends Controller
         }
 
         $getEmployee = Employee::find($id);
+
+
         $getEmployee->firstname = $request->firstName;
         $getEmployee->lastname = $request->lastName;
         $getEmployee->age = $request->age;
         $getEmployee->email = $request->email;
         $getEmployee->position_id = $request->position;
+
+        if ($request->hasFile('cv')) {
+            // delete file
+            Storage::disk('public')->delete('files/'. $getEmployee->encrypted_filename);
+
+            $file = $request->file('cv');
+
+            $originalFilename = $file->getClientOriginalName();
+            $encryptedFilename = $file->hashName();
+
+            // Store File
+            $file->store('public/files');
+
+            // rename attr
+            $getEmployee->original_filename = $originalFilename;
+            $getEmployee->encrypted_filename = $encryptedFilename;
+        }
+
         $getEmployee->save();
 
         return redirect()->route('employees.index')->with('success', 'Berhasil Mengupdate Data');
@@ -171,8 +211,21 @@ class EmployeeController extends Controller
         // DB::table('employees')
         //     ->where('id', $id)
         //     ->delete();
-        Employee::find($id)->delete();
+        $data = Employee::find($id);
+        Storage::disk('public')->delete('files/'. $data->encrypted_filename);
+        $data->delete();
 
         return redirect()->route('employees.index');
+    }
+
+    public function downloadFile($employeeId)
+    {
+        $employee = Employee::find($employeeId);
+        $encryptedFilename = 'public/files/'.$employee->encrypted_filename;
+        $downloadFilename = Str::lower($employee->firstname.'_'.$employee->lastname.'_cv.pdf');
+
+        if(Storage::exists($encryptedFilename)) {
+            return Storage::download($encryptedFilename, $downloadFilename);
+        }
     }
 }
