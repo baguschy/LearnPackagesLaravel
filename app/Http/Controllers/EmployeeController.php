@@ -8,6 +8,9 @@ use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\EmployeesExport;
+use PDF;
 use Validator;
 
 class EmployeeController extends Controller
@@ -18,20 +21,9 @@ class EmployeeController extends Controller
     public function index()
     {
         $pageTitle = 'Employee List';
+        confirmDelete();
 
-        // $employees = DB::select(
-        //     'select *, employees.id as employee_id, positions.name as position_name
-        //     from employees
-        //     left join positions on employees.position_id = positions.id'
-        // );
-
-        // $employees = DB::table('employees')
-        //             ->leftJoin('positions', 'employees.position_id', '=', 'positions.id')
-        //             ->get(['employees.*', 'positions.name']);
-
-        $employees = Employee::all();
-
-        return view('employee.index', compact('pageTitle', 'employees'));
+        return view('employee.index', compact('pageTitle'));
     }
 
     /**
@@ -102,7 +94,8 @@ class EmployeeController extends Controller
 
         $employee->save();
 
-        // return $request->all();
+        Alert::success('Added Successfully', 'Employee Data Added Successfully.');
+
         return redirect()->route('employees.index');
 
     }
@@ -200,6 +193,8 @@ class EmployeeController extends Controller
 
         $getEmployee->save();
 
+        Alert::success('Changed Successfully', 'Employee Data Changed Successfully.');
+
         return redirect()->route('employees.index')->with('success', 'Berhasil Mengupdate Data');
     }
 
@@ -215,6 +210,7 @@ class EmployeeController extends Controller
         Storage::disk('public')->delete('files/'. $data->encrypted_filename);
         $data->delete();
 
+        Alert::success('Deleted Successfully', 'Employee Data Deleted Successfully.');
         return redirect()->route('employees.index');
     }
 
@@ -227,5 +223,33 @@ class EmployeeController extends Controller
         if(Storage::exists($encryptedFilename)) {
             return Storage::download($encryptedFilename, $downloadFilename);
         }
+    }
+
+    public function getData(Request $request)
+    {
+        $employees = Employee::with('position');
+
+        if ($request->ajax()) {
+            return datatables()->of($employees)
+                ->addIndexColumn()
+                ->addColumn('actions', function($employee) {
+                    return view('employee.action', compact('employee'));
+                })
+                ->toJson();
+        }
+    }
+
+    public function exportExcel()
+    {
+        return Excel::download(new EmployeesExport, 'employees.xlsx');
+    }
+
+    public function exportPdf()
+    {
+        $employees = Employee::all();
+
+        $pdf = PDF::loadView('employee.export_pdf', compact('employees'));
+
+        return $pdf->download('employees.pdf');
     }
 }
